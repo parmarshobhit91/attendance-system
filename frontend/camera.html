@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Face Capture</title>
+</head>
+<body>
+
+<h2>Face Registration</h2>
+
+<video id="video" autoplay style="width:400px"></video>
+<br><br>
+
+<button onclick="capture()">Capture & Send</button>
+
+<script>
+const video = document.getElementById("video");
+
+// 1. Start camera
+navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => {
+    video.srcObject = stream;
+  });
+
+// 2. Capture frame
+function capture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0);
+
+  const image = canvas.toDataURL("image/jpeg");
+
+  // 3. Send to backend
+  fetch("http://127.0.0.1:8000/auth/register-face", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email: "test@gmail.com",
+      image: image
+    })
+  })
+  .then(res => res.json())
+  .then(data => console.log(data));
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Face Attendance System</title>
+</head>
+<body>
+
+<h2>🎥 Face Attendance System</h2>
+
+<video id="video" autoplay width="400"></video>
+<br><br>
+
+<input type="email" id="email" placeholder="Enter Email" />
+<br><br>
+
+<button onclick="registerFace()">📸 Register Face</button>
+<button onclick="markAttendance()">✅ Mark Attendance</button>
+
+<script>
+const video = document.getElementById("video");
+
+// Start camera
+navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => {
+    video.srcObject = stream;
+  })
+  .catch(err => console.log("Camera error:", err));
+
+// Capture image from webcam
+function captureImage() {
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0);
+
+  const image = canvas.toDataURL("image/jpeg");
+
+  console.log("📸 Captured Image Base64:", image); // DEBUG
+
+  return image;
+}
+
+/* =========================
+   📸 REGISTER FACE
+========================= */
+function registerFace() {
+  const email = document.getElementById("email").value;
+
+  if (!email) {
+    alert("❌ Enter email first");
+    return;
+  }
+
+  const image = captureImage();
+
+  fetch("http://127.0.0.1:8000/auth/register-face", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email: email,
+      image: image
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("Register Response:", data);
+
+    if (data.msg) {
+      alert("✅ " + data.msg);
+    } else {
+      alert("❌ " + data.error);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Request failed");
+  });
+}
+
+/* =========================
+   ✅ MARK ATTENDANCE
+========================= */
+function markAttendance() {
+  const email = document.getElementById("email").value;
+
+  if (!email) {
+    alert("❌ Enter email first");
+    return;
+  }
+
+  const image = captureImage();
+
+  fetch("http://127.0.0.1:8000/attendance/punch", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email: email,
+      image: image,
+      location: {
+        lat: 23.2,
+        lng: 77.4
+      }
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("Attendance Response:", data);
+
+    if (data.msg) {
+      if (data.user) {
+        alert("✅ " + data.msg + " for " + data.user);
+      } else {
+        alert("✅ " + data.msg);
+      }
+    } else {
+      alert("❌ " + data.error);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Request failed");
+  });
+}
+</script>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Face Attendance System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    video {
+      border: 2px solid #333;
+      border-radius: 10px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Face Attendance System</h2>
+
+<video id="video" autoplay playsinline width="400"></video>
+
+<br>
+
+<button onclick="markAttendance()">Mark Attendance</button>
+
+<p id="status"></p>
+
+<script>
+const video = document.getElementById("video");
+const statusText = document.getElementById("status");
+
+// Start camera properly
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+  } catch (err) {
+    console.error("Camera error:", err);
+    alert("Camera not accessible");
+  }
+}
+
+// Capture + send to backend
+async function markAttendance() {
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    const image = canvas.toDataURL("image/jpeg");
+
+    statusText.innerText = "Processing...";
+
+    const response = await fetch("http://127.0.0.1:8000/attendance/punch", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        image: image
+      })
+    });
+
+    const data = await response.json();
+    console.log(data);
+
+    if (data.error) {
+      statusText.innerText = "❌ " + data.error;
+      alert(data.error);
+    } else {
+      statusText.innerText = "✅ " + data.msg + " (" + data.user + ")";
+      alert(`${data.msg} (${data.user})`);
+    }
+
+  } catch (err) {
+    console.error(err);
+    statusText.innerText = "❌ Error occurred";
+  }
+}
+
+// start camera on load
+startCamera();
+</script>
+
+</body>
+</html>
