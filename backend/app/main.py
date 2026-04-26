@@ -6,12 +6,20 @@ logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://attendance-system-five-red.vercel.app",
+    "*",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # change in production later
+    allow_origins=origins,  # change in production later
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    
 )
 
 # routers
