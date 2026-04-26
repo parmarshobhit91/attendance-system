@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+}
+
+.container {
+  text-align: center;
+  padding: 40px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.camera-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+video {
+  width: 400px;
+  border-radius: 12px;
+  border: 2px solid #38bdf8;
+}
+
+.buttons {
+  margin: 10px;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  background: #38bdf8;
+  color: black;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
+
+.status {
+  margin-top: 20px;
+  font-size: 18px;
+}
